@@ -23,6 +23,8 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
 	console.log('New user connected');
 
+
+	// when a user disconnects
 	socket.on('disconnect', () => {
 		console.log("Client disconnected");
 		var user = users.removeUser(socket.id);
@@ -33,14 +35,7 @@ io.on('connection', (socket) => {
 		}
 	});
 
-	socket.on('createMessage', (newMessage, callback) => {
-
-		var user = users.getUser(socket.id);
-		io.to(user.room).emit('newMessage', generateMessage(newMessage.from, newMessage.text));
-		callback();
-	});
-
-
+	// when a user join
 	socket.on('join', (params, callback) => {
 		if (!isRealString(params.name) || !isRealString(params.room)) {
 			return callback('Name and/or room name invalid');
@@ -56,7 +51,20 @@ io.on('connection', (socket) => {
 		callback();
 	});
 
+	// when a user send a message
 
+	socket.on('createMessage', (newMessage, callback) => {
+
+		var user = users.getUser(socket.id);
+
+		if (user && isRealString(newMessage.text)) {
+			io.to(user.room).emit('newMessage', generateMessage(user.name, newMessage.text));
+		}
+		callback();
+	});
+
+
+	// when a user sends his/her location
 	socket.on('createLocationMessage', (location) => {
 		var user = users.getUser(socket.id);
 		io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, location.latitude, location.longitude));
