@@ -17,7 +17,16 @@ var scrollToButtom = function () {
 }
 
 socket.on('connect', function () {
-	console.log('Connected to server');
+	var params = $.deparam(window.location.serach);
+	console.log(params);
+	socket.emit('join', params, function (err) {
+		if (err) {
+			alert(err);
+			window.location.href = '/';
+		} else {
+			console.log('No Error');
+		}
+	});
 });
 
 socket.on('disconnect', function () {

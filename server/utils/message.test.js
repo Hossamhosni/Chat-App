@@ -1,6 +1,6 @@
 'use strict';
 
-var expect = require('expect');
+const expect = require('expect');
 var {generateMessage, generateLocationMessage} = require('./message');
 
 describe('generateMessage', () => {
